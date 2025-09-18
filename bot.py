@@ -676,7 +676,7 @@ async def main() -> None:
     logger.info("Все обработчики добавлены")
 
     # Настройка webhook
-    port = int(os.getenv("PORT", 8443))
+    port = int(os.getenv("PORT", 10000))  # Render обычно использует порт 10000
     webhook_path = os.getenv("WEBHOOK_PATH", "")
     if RENDER_EXTERNAL_HOSTNAME:
         webhook_url = f"https://{RENDER_EXTERNAL_HOSTNAME}/{webhook_path}".rstrip('/')
@@ -688,14 +688,12 @@ async def main() -> None:
     logger.info(f"Webhook установлен: {webhook_url}")
 
     logger.info("Бот запущен и готов к работе!")
-    application.run_webhook(
+    await application.run_webhook(
         listen="0.0.0.0",
         port=port,
         url_path=webhook_path,
         webhook_url=webhook_url
     )
-
-app = Application.builder().token(BOT_TOKEN).build()
 
 if __name__ == '__main__':
     asyncio.run(main())
