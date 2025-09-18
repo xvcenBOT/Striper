@@ -688,14 +688,13 @@ async def main():
     logger.info(f"Webhook установлен: {webhook_url}")
 
     logger.info("Бот запущен и готов к работе!")
-    # Запускаем webhook без управления циклом
-    application.run_webhook(
+    # Запускаем webhook
+    await application.run_webhook(
         listen="0.0.0.0",
         port=port,
         url_path=webhook_path,
-        webhook_url=webhook_url,
-        close_loop=False
+        webhook_url=webhook_url
     )
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
