@@ -655,6 +655,34 @@ async def back_to_main_menu_handler(update: Update, context: ContextTypes.DEFAUL
         )
 
 
+async def ensure_webhook_deleted(bot, max_attempts=5, delay=2):
+    """Проверяет и удаляет webhook с повторными попытками."""
+    for attempt in range(max_attempts):
+        try:
+            # Проверяем текущий статус webhook
+            webhook_info = await bot.get_webhook_info()
+            logger.info(f"Webhook info: {webhook_info}")
+            if webhook_info.url:
+                logger.info(f"Webhook активен, попытка удаления (попытка {attempt + 1}/{max_attempts})")
+                await bot.delete_webhook(drop_pending_updates=True)
+                await asyncio.sleep(delay)  # Даем время Telegram обработать удаление
+                webhook_info = await bot.get_webhook_info()
+                if not webhook_info.url:
+                    logger.info("Webhook успешно удален")
+                    return True
+                else:
+                    logger.warning(f"Webhook все еще активен после попытки удаления: {webhook_info.url}")
+            else:
+                logger.info("Webhook не установлен")
+                return True
+        except Exception as e:
+            logger.error(f"Ошибка при проверке/удалении webhook (попытка {attempt + 1}/{max_attempts}): {e}")
+            await asyncio.sleep(delay)
+    
+    logger.error("Не удалось удалить webhook после всех попыток")
+    return False
+
+
 async def main():
     logger.info("Запуск бота...")
     application = Application.builder().token(BOT_TOKEN).build()
@@ -674,9 +702,12 @@ async def main():
 
     logger.info("Все обработчики добавлены")
 
-    # Удаляем webhook, если он был установлен ранее
-    await application.bot.delete_webhook(drop_pending_updates=True)
-    logger.info("Webhook удалён, запуск в режиме polling...")
+    # Удаляем webhook с повторными попытками
+    if not await ensure_webhook_deleted(application.bot):
+        logger.error("Не удалось гарантировать удаление webhook. Бот не запускается.")
+        return
+
+    logger.info("Запуск в режиме polling...")
 
     # Запускаем бота в режиме polling
     await application.initialize()
