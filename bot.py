@@ -612,7 +612,6 @@ def main() -> None:
     
     if WEBHOOK_URL:
         application.run_webhook(
-            listen="0.0.0.0",
             port=PORT,
             url_path=BOT_TOKEN,
             webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}"
