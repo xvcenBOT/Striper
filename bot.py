@@ -684,5 +684,8 @@ async def main():
     await application.updater.start_polling()
     logger.info("Бот успешно запущен в режиме polling")
 
+    # Держим приложение активным
+    await asyncio.Event().wait()
+
 if __name__ == '__main__':
     asyncio.run(main())
