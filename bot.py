@@ -656,7 +656,7 @@ async def back_to_main_menu_handler(update: Update, context: ContextTypes.DEFAUL
         )
 
 
-async def main() -> None:
+async def main():
     logger.info("Запуск бота...")
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -692,8 +692,14 @@ async def main() -> None:
         listen="0.0.0.0",
         port=port,
         url_path=webhook_path,
-        webhook_url=webhook_url
+        webhook_url=webhook_url,
+        close_loop=False  # Не закрываем событийный цикл
     )
 
+# Запускаем приложение без asyncio.run()
 if __name__ == '__main__':
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(main())
+    finally:
+        loop.close()
