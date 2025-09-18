@@ -679,7 +679,10 @@ async def main():
     logger.info("Webhook удалён, запуск в режиме polling...")
 
     # Запускаем бота в режиме polling
-    await application.run_polling()
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
+    logger.info("Бот успешно запущен в режиме polling")
 
 if __name__ == '__main__':
     asyncio.run(main())
