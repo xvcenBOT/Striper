@@ -655,68 +655,29 @@ async def back_to_main_menu_handler(update: Update, context: ContextTypes.DEFAUL
         )
 
 
-async def ensure_webhook_deleted(bot, max_attempts=5, delay=2):
-    """Проверяет и удаляет webhook с повторными попытками."""
-    for attempt in range(max_attempts):
-        try:
-            # Проверяем текущий статус webhook
-            webhook_info = await bot.get_webhook_info()
-            logger.info(f"Webhook info: {webhook_info}")
-            if webhook_info.url:
-                logger.info(f"Webhook активен, попытка удаления (попытка {attempt + 1}/{max_attempts})")
-                await bot.delete_webhook(drop_pending_updates=True)
-                await asyncio.sleep(delay)  # Даем время Telegram обработать удаление
-                webhook_info = await bot.get_webhook_info()
-                if not webhook_info.url:
-                    logger.info("Webhook успешно удален")
-                    return True
-                else:
-                    logger.warning(f"Webhook все еще активен после попытки удаления: {webhook_info.url}")
-            else:
-                logger.info("Webhook не установлен")
-                return True
-        except Exception as e:
-            logger.error(f"Ошибка при проверке/удалении webhook (попытка {attempt + 1}/{max_attempts}): {e}")
-            await asyncio.sleep(delay)
-    
-    logger.error("Не удалось удалить webhook после всех попыток")
-    return False
-
-
-async def main():
+def main() -> None:
     logger.info("Запуск бота...")
     application = Application.builder().token(BOT_TOKEN).build()
-
-    # Добавляем обработчики
+    
     application.add_handler(CommandHandler("start", start))
+    
     application.add_handler(CallbackQueryHandler(buy_accounts_handler, pattern='^buy_accounts$'))
     application.add_handler(CallbackQueryHandler(support_handler, pattern='^support$'))
     application.add_handler(CallbackQueryHandler(faq_handler, pattern='^faq$'))
     application.add_handler(CallbackQueryHandler(referral_system_handler, pattern='^referral_system$'))
     application.add_handler(CallbackQueryHandler(earn_money_handler, pattern='^earn_money$'))
+    
     application.add_handler(CallbackQueryHandler(handle_pack_selection, pattern=re.compile(r'^\{"action": "select_pack".*')))
     application.add_handler(CallbackQueryHandler(handle_cryptobot_payment, pattern='^pay_cryptobot$'))
     application.add_handler(CallbackQueryHandler(check_payment_handler, pattern='^check_payment$'))
+    
     application.add_handler(CallbackQueryHandler(back_to_buy_menu_handler, pattern='^back_to_buy_menu$'))
     application.add_handler(CallbackQueryHandler(back_to_main_menu_handler, pattern='^back_to_main_menu$'))
-
+    
     logger.info("Все обработчики добавлены")
+    logger.info("Бот запущен и готов к работе!")
+    application.run_polling()
 
-    # Удаляем webhook с повторными попытками
-    if not await ensure_webhook_deleted(application.bot):
-        logger.error("Не удалось гарантировать удаление webhook. Бот не запускается.")
-        return
-
-    logger.info("Запуск в режиме polling...")
-
-    # Запускаем бота в режиме polling
-    await application.initialize()
-    await application.start()
-    await application.updater.start_polling()
-    logger.info("Бот успешно запущен в режиме polling")
-
-    # Держим приложение активным
-    await asyncio.Event().wait()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
