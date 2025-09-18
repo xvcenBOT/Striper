@@ -268,7 +268,7 @@ async def buy_accounts_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         [InlineKeyboardButton("Premium Pack (20 аккаунтов)", callback_data='{"action": "select_pack", "quantity": 20}')],
         [InlineKeyboardButton("Ultimate Pack (30 аккаунтов)", callback_data='{"action": "select_pack", "quantity": 30}')],
         [InlineKeyboardButton("Свое количество", callback_data='{"action": "select_custom_quantity"}')],
-        [InlineKeyboardButton("Вернуться назад", callback_data='back_to_buy_menu')]
+        [InlineKeyboardButton("Вернуться назад", callback_data='back_to_main_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
