@@ -28,7 +28,6 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CRYPTO_BOT_TOKEN = os.getenv("CRYPTO_BOT_TOKEN")
 BOT_USERNAME = os.getenv("BOT_USERNAME")
-RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 
 if not BOT_TOKEN:
     logger.error("BOT_TOKEN не найден!")
@@ -675,26 +674,12 @@ async def main():
 
     logger.info("Все обработчики добавлены")
 
-    # Настройка webhook
-    port = int(os.getenv("PORT", 8443))  # Используем порт 8443 для Render
-    webhook_path = os.getenv("WEBHOOK_PATH", "")
-    if RENDER_EXTERNAL_HOSTNAME:
-        webhook_url = f"https://{RENDER_EXTERNAL_HOSTNAME}/{webhook_path}".rstrip('/')
-    else:
-        logger.error("RENDER_EXTERNAL_HOSTNAME не указан, бот не запустится")
-        exit()
+    # Удаляем webhook, если он был установлен ранее
+    await application.bot.delete_webhook(drop_pending_updates=True)
+    logger.info("Webhook удалён, запуск в режиме polling...")
 
-    await application.bot.set_webhook(url=webhook_url)
-    logger.info(f"Webhook установлен: {webhook_url}")
-
-    logger.info("Бот запущен и готов к работе!")
-    # Запускаем webhook
-    await application.run_webhook(
-        listen="0.0.0.0",
-        port=port,
-        url_path=webhook_path,
-        webhook_url=webhook_url
-    )
+    # Запускаем бота в режиме polling
+    await application.run_polling()
 
 if __name__ == '__main__':
     asyncio.run(main())
