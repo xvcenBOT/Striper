@@ -669,61 +669,24 @@ async def back_to_main_menu_handler(update: Update, context: ContextTypes.DEFAUL
             parse_mode='HTML'
         )
 
-
-def main() -> None:
+def main() -> None: 
     logger.info("Запуск бота...")
     application = Application.builder().token(BOT_TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
     
-    application.add_handler(CallbackQueryHandler(buy_accounts_handler, pattern='^buy_accounts
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(support_handler, pattern='^support
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(faq_handler, pattern='^faq
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(referral_system_handler, pattern='^referral_system
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(earn_money_handler, pattern='^earn_money
-
-
-if __name__ == '__main__':
-    main()))
+    application.add_handler(CallbackQueryHandler(buy_accounts_handler, pattern='^buy_accounts$'))
+    application.add_handler(CallbackQueryHandler(support_handler, pattern='^support$'))
+    application.add_handler(CallbackQueryHandler(faq_handler, pattern='^faq$'))
+    application.add_handler(CallbackQueryHandler(referral_system_handler, pattern='^referral_system$'))
+    application.add_handler(CallbackQueryHandler(earn_money_handler, pattern='^earn_money$'))
     
-    application.add_handler(CallbackQueryHandler(handle_pack_selection, pattern=re.compile(r'^\{"action": "select_pack".*')))
-    application.add_handler(CallbackQueryHandler(handle_cryptobot_payment, pattern='^pay_cryptobot
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(check_payment_handler, pattern='^check_payment
-
-
-if __name__ == '__main__':
-    main()))
+    application.add_handler(CallbackQueryHandler(handle_pack_selection, pattern=re.compile(r'^{"action": "select_pack".*}')))
+    application.add_handler(CallbackQueryHandler(handle_cryptobot_payment, pattern='^pay_cryptobot$'))
+    application.add_handler(CallbackQueryHandler(check_payment_handler, pattern='^check_payment$'))
     
-    application.add_handler(CallbackQueryHandler(back_to_buy_menu_handler, pattern='^back_to_buy_menu
-
-
-if __name__ == '__main__':
-    main()))
-    application.add_handler(CallbackQueryHandler(back_to_main_menu_handler, pattern='^back_to_main_menu
-
-
-if __name__ == '__main__':
-    main()))
+    application.add_handler(CallbackQueryHandler(back_to_buy_menu_handler, pattern='^back_to_buy_menu$'))
+    application.add_handler(CallbackQueryHandler(back_to_main_menu_handler, pattern='^back_to_main_menu$'))
     
     logger.info("Все обработчики добавлены")
 
