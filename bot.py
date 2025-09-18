@@ -8,6 +8,7 @@ import re
 import json
 import aiohttp
 from datetime import datetime, timedelta
+import telegram
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -271,11 +272,17 @@ async def buy_accounts_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(
-        text=buy_text,
-        reply_markup=reply_markup,
-        parse_mode='HTML'
-    )
+    try:
+        await query.edit_message_text(
+            text=buy_text,
+            reply_markup=reply_markup,
+            parse_mode='HTML'
+        )
+    except telegram.error.BadRequest as e:
+        if "Message is not modified" in str(e):
+            logger.info("Сообщение не было изменено, так как оно идентично.")
+        else:
+            raise e
 
 
 def get_price_per_item(quantity: int) -> float:
@@ -695,8 +702,8 @@ def main() -> None:
         application.run_webhook(
             listen="0.0.0.0",
             port=PORT,
-            url_path=BOT_TOKEN,
-            webhook_url=f"{RENDER_EXTERNAL_URL}/{BOT_TOKEN}"
+            url_path="webhook",
+            webhook_url=f"{RENDER_EXTERNAL_URL}/webhook"
         )
     else:
         logger.info("Бот запускается в режиме опроса.")
